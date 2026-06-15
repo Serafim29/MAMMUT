@@ -1,10 +1,38 @@
-import { Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 import Navbar from '../components/Navbar'
+import ProductCard from '../components/ProductCard'
+import { supabase } from '../supabaseClient'
 import teaserDesktop from '../assets/teaser_desktop.jpg'
 import teaserMobile from '../assets/teaser_mobile.jpg'
 import trailRun from '../assets/TrailRun_SS26_Chamonix_LG-9.jpg'
 
 function Home({ session }) {
+  const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    async function fetchProducts() {
+      try {
+        setLoading(true)
+        const { data, error } = await supabase
+          .from('products')
+          .select('*')
+          .order('created_at', { ascending: true })
+        
+        if (error) throw error
+        setProducts(data || [])
+      } catch (err) {
+        console.error('Error fetching products:', err)
+        setError(err.message)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchProducts()
+  }, [])
+
   return (
     <div className="min-h-screen bg-[#F5F5F3] flex flex-col font-sans text-black">
       <Navbar session={session} />
@@ -73,8 +101,8 @@ function Home({ session }) {
 
         </div>
 
-        <section className="bg-[#E6DFD5] py-20 px-8 md:px-16 lg:px-24 flex flex-col items-start text-black w-full">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-black uppercase tracking-normal leading-tight font-display">
+        <section className="bg-[#E6DFD5] mt-10 py-15 px-8 md:px-16 lg:px-12 flex flex-col items-start text-black w-full">
+          <h2 className="text-3xl md:text-4xl lg:text-4xl font-black uppercase tracking-normal leading-tight font-display">
             A gift for you
           </h2>
           
@@ -108,6 +136,28 @@ function Home({ session }) {
               </span>
             </button>
           </div>
+        </section>
+
+        <section className="bg-white px-4 md:px-8 lg:px-12 py-16 w-full flex-1">
+          {loading ? (
+            <div className="flex items-center justify-center py-24">
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-black"></div>
+            </div>
+          ) : error ? (
+            <div className="text-center text-red-500 py-16 font-medium">
+              Eroare la incarcarea produselor: {error}
+            </div>
+          ) : products.length === 0 ? (
+            <div className="text-center text-neutral-500 py-16">
+              Nu s-au gasit produse.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-12">
+              {products.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          )}
         </section>
       </main>
     </div>
