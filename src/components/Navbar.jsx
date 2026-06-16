@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { FiMenu, FiSearch, FiUser, FiHeart, FiShoppingBag, FiLogOut, FiChevronDown, FiX } from 'react-icons/fi'
+import { FiMenu, FiSearch, FiUser, FiHeart, FiShoppingBag, FiLogOut, FiChevronDown, FiX, FiChevronRight } from 'react-icons/fi'
 import { supabase } from '../supabaseClient'
+import { JacketIcon, HoodieIcon, PantsIcon, CapIcon, HikingShoesIcon, MountaineeringBootsIcon, TrailRunningShoesIcon, EverydayShoesIcon, ApproachShoesIcon, BackpackIcon, AvalancheIcon, ClimbingIcon, SleepingBagIcon, AccessoriesIcon } from './MenuIcons'
 
 function Navbar({ session }) {
   const navigate = useNavigate()
@@ -15,6 +16,116 @@ function Navbar({ session }) {
   ]
   const [activeNotice, setActiveNotice] = useState(0)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const [isNavMenuOpen, setIsNavMenuOpen] = useState(false)
+  const [activeGender, setActiveGender] = useState('all')
+  const [hoveredCategory, setHoveredCategory] = useState(null)
+
+  const menuCategories = [
+    {
+      name: 'Clothing',
+      hasSubmenu: true,
+      submenuItems: [
+        { name: 'Discover all', icon: null },
+        { name: 'Jackets & Vests', icon: 'jacket' },
+        { name: 'Tops', icon: 'hoodie' },
+        { name: 'Pants & Shorts', icon: 'pants' },
+        { name: 'Accessories', icon: 'cap' }
+      ]
+    },
+    {
+      name: 'Footwear',
+      hasSubmenu: true,
+      submenuItems: [
+        { name: 'Discover all', icon: null },
+        { name: 'Hiking Shoes', icon: 'hiking_shoes' },
+        { name: 'Mountaineering Boots', icon: 'mountaineering_boots' },
+        { name: 'Trail Running Shoes', icon: 'trail_running_shoes' },
+        { name: 'Everyday Shoes', icon: 'everyday_shoes' },
+        { name: 'Approach Shoes', icon: 'approach_shoes' }
+      ]
+    },
+    {
+      name: 'Equipment',
+      hasSubmenu: true,
+      submenuItems: [
+        { name: 'Discover all', icon: null },
+        { name: 'Backpacks & Bags', icon: 'backpack' },
+        { name: 'Avalanche Equipment', icon: 'avalanche' },
+        { name: 'Climbing Equipment', icon: 'climbing' },
+        { name: 'Sleeping Bags', icon: 'sleeping_bag' },
+        { name: 'Equipment Accessories', icon: 'eq_accessories' }
+      ]
+    },
+    {
+      name: 'Outlet',
+      hasSubmenu: false,
+      isHighlighted: true
+    },
+    {
+      name: 'Shop by Activity',
+      hasSubmenu: true,
+      submenuItems: [
+        { name: 'Hiking', icon: null },
+        { name: 'Climbing', icon: null },
+        { name: 'Mountaineering', icon: null },
+        { name: 'Snowsports', icon: null },
+        { name: 'Everyday', icon: null },
+        { name: 'Trail Running', icon: null },
+        { name: 'Travel', icon: null }
+      ]
+    },
+    {
+      name: 'Collections',
+      hasSubmenu: true,
+      submenuItems: [
+        { name: 'Hiking Patrol + Mammut', icon: null },
+        { name: 'Mountain Pro', icon: null },
+        { name: 'New Arrivals', icon: null },
+        { name: 'Color of the season', icon: null },
+        { name: 'Bestseller', icon: null },
+        { name: 'Eiger Extreme', icon: null }
+      ]
+    },
+    {
+      name: 'Explore Mammut',
+      hasSubmenu: true,
+      submenuItems: [
+        { name: 'Take a hike', icon: null },
+        { name: 'About us', icon: null },
+        { name: 'Responsibility', icon: null },
+        { name: 'Our Athletes', icon: null },
+        { name: 'Stories & Guides', icon: null },
+        { name: 'Mammut Mountain School Switzerland', icon: null },
+        { name: 'Repair & Care', icon: null },
+        { name: 'Technologies', icon: null },
+        { name: 'Jacket Finder', icon: null }
+      ]
+    },
+    {
+      name: 'Loyalty Program',
+      hasSubmenu: false
+    }
+  ]
+
+  const renderSubmenuIcon = (iconName) => {
+    switch (iconName) {
+      case 'jacket': return <JacketIcon />
+      case 'hoodie': return <HoodieIcon />
+      case 'pants': return <PantsIcon />
+      case 'cap': return <CapIcon />
+      case 'hiking_shoes': return <HikingShoesIcon />
+      case 'mountaineering_boots': return <MountaineeringBootsIcon />
+      case 'trail_running_shoes': return <TrailRunningShoesIcon />
+      case 'everyday_shoes': return <EverydayShoesIcon />
+      case 'approach_shoes': return <ApproachShoesIcon />
+      case 'backpack': return <BackpackIcon />
+      case 'avalanche': return <AvalancheIcon />
+      case 'climbing': return <ClimbingIcon />
+      case 'sleeping_bag': return <SleepingBagIcon />
+      case 'eq_accessories': return <AccessoriesIcon />
+      default: return null
+    }
+  }
 
   const handleAccountClick = () => {
     if (session) {
@@ -128,10 +239,172 @@ function Navbar({ session }) {
         <FiChevronDown size={11} className="stroke-[2.5px] mt-0.5" />
       </div>
 
+      {isNavMenuOpen && (
+        <div className="fixed inset-0 z-[100] flex">
+          <div 
+            onClick={() => {
+              setIsNavMenuOpen(false)
+              setHoveredCategory(null)
+            }}
+            className="fixed inset-0 bg-black/60 transition-opacity duration-300 animate-in fade-in duration-300 z-0"
+          />
+          
+          <div 
+            onMouseLeave={() => {
+              setIsNavMenuOpen(false)
+              setHoveredCategory(null)
+            }}
+            className="relative h-full bg-white flex shadow-2xl transition-all duration-300 animate-in slide-in-from-left duration-300 z-10"
+          >
+            <div className="w-[375px] h-full bg-white flex flex-col p-[20px] pt-[80px] relative z-10 border-r border-neutral-100 flex-shrink-0">
+              <button 
+                onClick={() => {
+                  setIsNavMenuOpen(false)
+                  setHoveredCategory(null)
+                }}
+                className="absolute top-[20px] left-[20px] text-black hover:text-neutral-600 cursor-pointer p-1"
+                aria-label="Close menu"
+              >
+                <FiX size={24} className="stroke-[2.5px]" />
+              </button>
+              
+              <div className="flex gap-2 w-full mt-4">
+                <button 
+                  onClick={() => setActiveGender('all')}
+                  className={`flex-1 text-center py-2 px-3 text-xs tracking-wider uppercase font-semibold border transition-all cursor-pointer ${
+                    activeGender === 'all' 
+                      ? 'border-black text-black font-bold' 
+                      : 'border-neutral-200 text-neutral-400 hover:text-black hover:border-black'
+                  }`}
+                >
+                  All genders
+                </button>
+                <button 
+                  onClick={() => setActiveGender('men')}
+                  className={`flex-1 text-center py-2 px-3 text-xs tracking-wider uppercase font-semibold border transition-all cursor-pointer ${
+                    activeGender === 'men' 
+                      ? 'border-black text-black font-bold' 
+                      : 'border-neutral-200 text-neutral-400 hover:text-black hover:border-black'
+                  }`}
+                >
+                  Men
+                </button>
+                <button 
+                  onClick={() => setActiveGender('women')}
+                  className={`flex-1 text-center py-2 px-3 text-xs tracking-wider uppercase font-semibold border transition-all cursor-pointer ${
+                    activeGender === 'women' 
+                      ? 'border-black text-black font-bold' 
+                      : 'border-neutral-200 text-neutral-400 hover:text-black hover:border-black'
+                  }`}
+                >
+                  Women
+                </button>
+              </div>
+
+              <div className="mt-8 flex-1 flex flex-col gap-0 overflow-y-auto pr-1">
+                {menuCategories.map((category) => {
+                  const isHovered = hoveredCategory?.name === category.name
+                  return (
+                    <div
+                      key={category.name}
+                      onMouseEnter={() => {
+                        if (category.hasSubmenu) {
+                          setHoveredCategory(category)
+                        } else {
+                          setHoveredCategory(null)
+                        }
+                      }}
+                      className="h-[60px] flex items-center justify-between cursor-pointer group/item select-none transition-colors duration-150"
+                    >
+                      {category.isHighlighted ? (
+                        <div className="flex items-center">
+                          <span className="inline-block bg-[#C5FF00] px-3.5 py-1 text-black font-extrabold text-[19px] tracking-tight transform skew-x-[-12deg] italic select-none">
+                            {category.name}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className={`text-[19px] font-semibold tracking-wide transition-all duration-150 ${
+                          isHovered 
+                            ? 'text-[#E30613] italic translate-x-1.5' 
+                            : 'text-black'
+                        }`}>
+                          {category.name}
+                        </span>
+                      )}
+                      
+                      {category.hasSubmenu && (
+                        <FiChevronRight 
+                          size={18} 
+                          className={`transition-colors duration-150 ${
+                            isHovered ? 'text-[#E30613]' : 'text-black'
+                          }`} 
+                        />
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+
+              <div className="mt-auto pt-6 flex flex-col gap-4">
+                <Link 
+                  to="/account" 
+                  onClick={() => setIsNavMenuOpen(false)}
+                  className="text-[19px] font-semibold text-black hover:text-[#E30613] transition-colors"
+                >
+                  Account
+                </Link>
+                <Link 
+                  to="/help" 
+                  onClick={() => setIsNavMenuOpen(false)}
+                  className="text-[19px] font-semibold text-black hover:text-[#E30613] transition-colors"
+                >
+                  Help Center
+                </Link>
+              </div>
+            </div>
+
+            {hoveredCategory && hoveredCategory.hasSubmenu && (
+              <div className="absolute inset-0 md:relative md:inset-auto md:w-[375px] md:h-full bg-[#F5F5F3] border-l border-neutral-200/50 flex flex-col p-[24px] pt-[80px] z-20 shadow-xl md:shadow-none animate-in slide-in-from-left-4 duration-300 flex-shrink-0">
+                <button 
+                  onClick={() => setHoveredCategory(null)}
+                  className="flex md:hidden items-center gap-1.5 text-xs uppercase font-extrabold tracking-widest text-[#E30613] hover:underline mb-6"
+                >
+                  ← Back
+                </button>
+                
+                <div className="flex flex-col gap-0 overflow-y-auto">
+                  {hoveredCategory.submenuItems.map((item) => (
+                    <div 
+                      key={item.name}
+                      className="h-[44px] flex items-center justify-between cursor-pointer group/sub select-none hover:text-[#E30613] transition-colors"
+                    >
+                      <span className="text-[16px] font-medium text-black group-hover/sub:text-[#E30613] transition-colors">
+                        {item.name}
+                      </span>
+                      {item.icon && (
+                        <div className="flex-shrink-0 opacity-90 transition-transform group-hover/sub:scale-105 duration-200">
+                          {renderSubmenuIcon(item.icon)}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       <nav className="bg-white border-b border-neutral-200 h-16 flex items-center justify-between px-4 md:px-8 select-none relative">
-        <button className="hidden md:flex items-center gap-2 text-black hover:text-neutral-600 transition-colors cursor-pointer group">
-          <FiMenu size={20} className="stroke-[2px]" />
-          <span className="font-semibold text-sm tracking-wide">Menu</span>
+        <button 
+          onMouseEnter={() => setIsNavMenuOpen(true)}
+          onClick={() => setIsNavMenuOpen(true)}
+          className="hidden md:flex items-center gap-2 text-black hover:text-[#E30613] transition-colors cursor-pointer group"
+        >
+          <FiMenu size={20} className="stroke-[2px] transition-transform duration-150 group-hover:scale-105" />
+          <span className="font-semibold text-sm tracking-wide transition-all duration-150 group-hover:italic group-hover:translate-x-1 group-hover:text-[#E30613]">
+            Menu
+          </span>
         </button>
 
         <Link 
@@ -188,7 +461,11 @@ function Navbar({ session }) {
             <FiShoppingBag size={22} className="stroke-[1.75px]" />
           </button>
 
-          <button className="flex md:hidden text-black hover:text-neutral-600 transition-colors cursor-pointer" aria-label="Menu">
+          <button 
+            onClick={() => setIsNavMenuOpen(true)}
+            className="flex md:hidden text-black hover:text-neutral-600 transition-colors cursor-pointer" 
+            aria-label="Menu"
+          >
             <FiMenu size={22} className="stroke-[2px]" />
           </button>
         </div>
