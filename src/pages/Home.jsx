@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import 'swiper/css'
 import Navbar from '../components/Navbar'
 import ProductCard from '../components/ProductCard'
 import { supabase } from '../supabaseClient'
@@ -10,6 +12,7 @@ function Home({ session }) {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [isDesktop, setIsDesktop] = useState(typeof window !== 'undefined' ? window.innerWidth > 1023 : true)
 
   useEffect(() => {
     async function fetchProducts() {
@@ -33,6 +36,15 @@ function Home({ session }) {
     fetchProducts()
   }, [])
 
+  useEffect(() => {
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth > 1023)
+    }
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
   return (
     <div className="min-h-screen bg-[#F5F5F3] flex flex-col font-sans text-black">
       <Navbar session={session} />
@@ -54,7 +66,7 @@ function Home({ session }) {
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
             
             <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12 lg:p-16 flex flex-col items-start text-white select-none">
-              <h2 className="text-3xl md:text-[36px] lg:text-[42px] font-bold uppercase tracking-normal leading-[1.08]">
+              <h2 className="text-2xl md:text-[36px] lg:text-[42px] font-bold uppercase tracking-normal leading-[1.08]">
                 Flowers For <br className="hidden md:inline" /> Society + <br className="inline md:hidden" /> Mammut
               </h2>
               <p className="text-xs md:text-sm font-normal text-neutral-200 mt-4 max-w-sm md:max-w-md leading-relaxed">
@@ -110,28 +122,28 @@ function Home({ session }) {
             Planning your summer adventures? <strong className="font-bold">Enjoy a free pair of Trail Running Targeted Cushion Crew socks with your next footwear purchase.</strong> <span className="inline-block hover:underline cursor-pointer font-medium">Read T&C* ↗</span>
           </p>
 
-          <div className="mt-6 text-sm md:text-base text-neutral-800 space-y-1.5">
-            <p className="font-semibold text-neutral-900 mb-2">Follow these steps to redeem the offer:</p>
+          <div className="mt-5 text-sm md:text-base text-neutral-800 space-y-1.5">
+            <p className=" text-neutral-900 mb-2">Follow these steps to redeem the offer:</p>
             <p>1. Add any full price footwear product to your cart.</p>
             <p>2. Add one size of the free socks to your cart.</p>
             <p>3. Enjoy your gift!</p>
           </div>
 
-          <div className="flex flex-col md:flex-row gap-4 mt-8 w-full md:w-auto">
-            <button className="inline-flex items-center border border-black bg-transparent text-black font-extrabold uppercase tracking-[0.1em] text-[11px] md:text-xs select-none hover:bg-black hover:text-white transition-all group cursor-pointer h-[50px] rounded-none w-full md:w-auto">
-              <span className="px-6 flex items-center justify-center h-full text-center whitespace-nowrap flex-1 md:flex-initial">
+          <div className="flex flex-col lg:flex-row gap-4 mt-8 w-full lg:w-auto">
+            <button className="inline-flex items-center border border-black bg-transparent text-black font-extrabold uppercase tracking-[0.1em] text-[10px] lg:text-xs select-none hover:bg-black hover:text-white transition-all group cursor-pointer h-[42px] lg:h-[50px] rounded-none w-full max-w-[240px] lg:w-auto">
+              <span className="px-4 lg:px-6 flex items-center justify-center h-full text-center whitespace-nowrap flex-1 lg:flex-initial">
                 SHOP FOOTWEAR
               </span>
-              <span className="w-12 h-full border-l border-black flex items-center justify-center text-lg transition-transform group-hover:translate-x-1 flex-shrink-0">
+              <span className="w-10 lg:w-12 h-full border-l border-black flex items-center justify-center text-base lg:text-lg transition-transform group-hover:translate-x-1 flex-shrink-0">
                 →
               </span>
             </button>
 
-            <button className="inline-flex items-center border border-black bg-transparent text-black font-extrabold uppercase tracking-[0.1em] text-[11px] md:text-xs select-none hover:bg-black hover:text-white transition-all group cursor-pointer h-[50px] rounded-none w-full md:w-auto">
-              <span className="px-6 flex items-center justify-center h-full text-center whitespace-nowrap flex-1 md:flex-initial">
+            <button className="inline-flex items-center border border-black bg-transparent text-black font-extrabold uppercase tracking-[0.1em] text-[10px] lg:text-xs select-none hover:bg-black hover:text-white transition-all group cursor-pointer h-[42px] lg:h-[50px] rounded-none w-full max-w-[240px] lg:w-auto">
+              <span className="px-4 lg:px-6 flex items-center justify-center h-full text-center whitespace-nowrap flex-1 lg:flex-initial">
                 GET YOUR SOCKS
               </span>
-              <span className="w-12 h-full border-l border-black flex items-center justify-center text-lg transition-transform group-hover:translate-x-1 flex-shrink-0">
+              <span className="w-10 lg:w-12 h-full border-l border-black flex items-center justify-center text-base lg:text-lg transition-transform group-hover:translate-x-1 flex-shrink-0">
                 →
               </span>
             </button>
@@ -151,12 +163,31 @@ function Home({ session }) {
             <div className="text-center text-neutral-500 py-16">
               Nu s-au gasit produse.
             </div>
-          ) : (
+          ) : isDesktop ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-12">
               {products.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
+          ) : (
+            <Swiper
+              spaceBetween={20}
+              slidesPerView={1.2}
+              grabCursor={true}
+              breakpoints={{
+                640: {
+                  slidesPerView: 2.2,
+                  spaceBetween: 24,
+                },
+              }}
+              className="w-full"
+            >
+              {products.map((product) => (
+                <SwiperSlide key={product.id} className="pb-4">
+                  <ProductCard product={product} />
+                </SwiperSlide>
+              ))}
+            </Swiper>
           )}
         </section>
       </main>
