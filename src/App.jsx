@@ -4,6 +4,8 @@ import { supabase } from './supabaseClient'
 import Hoame from './pages/Home.jsx'
 import SignUp from './pages/SignUp.jsx'
 import Category from './pages/Category.jsx'
+import Saved from './pages/Saved.jsx'
+import { FavoritesProvider } from './context/FavoritesContext'
 
 function App() {
   const [session, setSession] = useState(null)
@@ -32,14 +34,18 @@ function App() {
   }
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Hoame session={session} />} />
-        <Route path="/signup" element={<SignUp session={session} />} />
-        <Route path="/category/:slug" element={<Category session={session} />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </Router>
+    <FavoritesProvider session={session}>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Hoame session={session} />} />
+          <Route path="/signup" element={<SignUp session={session} />} />
+          <Route path="/category/:slug" element={<Category session={session} />} />
+          <Route path="/saved" element={<Saved session={session} />} />
+          <Route path="/favorites" element={<Navigate to="/saved" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Router>
+    </FavoritesProvider>
   )
 }
 

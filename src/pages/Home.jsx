@@ -25,7 +25,6 @@ function Home({ session }) {
         setLoading(true);
         setCategoriesLoading(true);
 
-        // Fetch products (first 4 footwear products by id)
         const { data: prodData, error: prodError } = await supabase
           .from('products')
           .select('*')
@@ -36,7 +35,6 @@ function Home({ session }) {
         if (prodError) throw prodError;
         setProducts(prodData || []);
 
-        // Fetch categories for homepage (only those with images)
         const { data: catData, error: catError } = await supabase
           .from('categories')
           .select('*')

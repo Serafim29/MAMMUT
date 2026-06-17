@@ -3,8 +3,10 @@ import { Link, useNavigate } from 'react-router-dom'
 import { FiMenu, FiSearch, FiUser, FiHeart, FiShoppingBag, FiLogOut, FiChevronDown, FiX, FiChevronRight } from 'react-icons/fi'
 import { supabase } from '../supabaseClient'
 import { JacketIcon, HoodieIcon, PantsIcon, CapIcon, HikingShoesIcon, MountaineeringBootsIcon, TrailRunningShoesIcon, EverydayShoesIcon, ApproachShoesIcon, BackpackIcon, AvalancheIcon, ClimbingIcon, SleepingBagIcon, AccessoriesIcon } from './MenuIcons'
+import { useFavorites } from '../context/FavoritesContext'
 
 function Navbar({ session }) {
+  const { favorites } = useFavorites()
   const navigate = useNavigate()
   const [showDropdown, setShowDropdown] = useState(false)
   const dropdownRef = useRef(null)
@@ -453,9 +455,21 @@ function Navbar({ session }) {
             )}
           </div>
 
-          <button className="text-black hover:text-neutral-600 transition-colors cursor-pointer" aria-label="Favorites">
-            <FiHeart size={22} className="stroke-[1.75px]" />
-          </button>
+          <Link 
+            to="/saved"
+            className="text-black hover:text-neutral-600 transition-colors cursor-pointer relative flex items-center justify-center" 
+            aria-label="Favorites"
+          >
+            <FiHeart 
+              size={22} 
+              className={`stroke-[1.75px] ${favorites.length > 0 ? 'fill-[#E30613] stroke-[#E30613]' : ''}`} 
+            />
+            {favorites.length > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 bg-[#E30613] text-white text-[9px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center border border-white">
+                {favorites.length}
+              </span>
+            )}
+          </Link>
 
           <button className="text-black hover:text-neutral-600 transition-colors cursor-pointer" aria-label="Cart">
             <FiShoppingBag size={22} className="stroke-[1.75px]" />

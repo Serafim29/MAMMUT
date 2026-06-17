@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { FiChevronLeft, FiChevronRight, FiHeart } from 'react-icons/fi'
+import { useFavorites } from '../context/FavoritesContext'
 
 function ProductCard({ product }) {
+  const { isFavorite, toggleFavorite } = useFavorites()
   const images = product.variants?.[0]?.images || []
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
 
@@ -61,13 +63,19 @@ function ProductCard({ product }) {
           <span className="opacity-0 select-none text-[9px] py-0.5 leading-none">Spacer</span>
         )}
         <button 
-          className="text-neutral-500 hover:text-black transition-colors duration-200 focus:outline-none p-1 cursor-pointer"
+          className={`transition-colors duration-200 focus:outline-none p-1 cursor-pointer ${
+            isFavorite(product.id) ? 'text-[#E30613]' : 'text-neutral-500 hover:text-black'
+          }`}
           onClick={(e) => {
             e.stopPropagation()
             e.preventDefault()
+            toggleFavorite(product)
           }}
         >
-          <FiHeart className="text-[17px] stroke-[2]" />
+          <FiHeart 
+            className="text-[17px] stroke-[2]" 
+            fill={isFavorite(product.id) ? '#E30613' : 'none'}
+          />
         </button>
       </div>
 
