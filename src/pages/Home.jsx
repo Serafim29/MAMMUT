@@ -215,12 +215,12 @@ function Home({ session }) {
           )}
         </section>
 
-        <section className="bg-white px-4 md:px-8 lg:px-12 pb-24 w-full">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl md:text-[32px] font-bold text-black font-sans leading-tight">
+        <section className="bg-white px-4 md:px-8 lg:px-10 pb-5 w-full">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl md:text-[32px]  text-black font-sans leading-tight">
               Shop by category
             </h2>
-            <div className="flex items-center gap-2">
+            <div className="hidden lg:flex items-center gap-2">
               <button 
                 onClick={() => swiperRef.current?.slidePrev()}
                 className="w-10 h-10 rounded-full border border-neutral-200 bg-white flex items-center justify-center hover:bg-neutral-50 hover:border-neutral-300 active:scale-95 transition-all cursor-pointer shadow-sm"
@@ -247,30 +247,14 @@ function Home({ session }) {
               Nu s-au gasit categorii.
             </div>
           ) : (
-            <Swiper
-              spaceBetween={16}
-              slidesPerView={1.2}
-              grabCursor={true}
-              breakpoints={{
-                640: {
-                  slidesPerView: 2.3,
-                  spaceBetween: 16,
-                },
-                768: {
-                  slidesPerView: 3.3,
-                  spaceBetween: 20,
-                },
-                1024: {
-                  slidesPerView: 4.8,
-                  spaceBetween: 20,
-                }
-              }}
-              onSwiper={(swiper) => { swiperRef.current = swiper; }}
-              className="w-full"
-            >
-              {categories.map((category) => (
-                <SwiperSlide key={category.id}>
-                  <Link to={`/category/${category.slug}`} className="flex flex-col group cursor-pointer w-full text-black select-none">
+            <>
+              <div className="grid grid-cols-2 gap-x-1.5 gap-y-5 md:gap-x-2.5 md:gap-y-6 lg:hidden w-full">
+                {categories.map((category) => (
+                  <Link 
+                    key={category.id} 
+                    to={`/category/${category.slug}`} 
+                    className="flex flex-col group cursor-pointer w-full text-black select-none"
+                  >
                     <div className="relative aspect-[3/4] bg-[#ECECEC] w-full overflow-hidden rounded-none">
                       <img
                         src={category.image_url}
@@ -279,13 +263,44 @@ function Home({ session }) {
                         loading="lazy"
                       />
                     </div>
-                    <h3 className="font-bold text-[15px] text-neutral-900 mt-4 leading-snug tracking-tight group-hover:underline">
+                    <h3 className="font-bold text-[14px] md:text-[15px] text-neutral-900 mt-2 leading-snug tracking-tight group-hover:underline">
                       {category.name}
                     </h3>
                   </Link>
-                </SwiperSlide>
-              ))}
-            </Swiper>
+                ))}
+              </div>
+
+              <div className="hidden lg:block w-full">
+                <Swiper
+                  spaceBetween={12}
+                  slidesPerView={4.8}
+                  grabCursor={true}
+                  onSwiper={(swiper) => { swiperRef.current = swiper; }}
+                  className="w-full"
+                >
+                  {categories.map((category) => (
+                    <SwiperSlide key={category.id}>
+                      <Link 
+                        to={`/category/${category.slug}`} 
+                        className="flex flex-col group cursor-pointer w-full text-black select-none"
+                      >
+                        <div className="relative aspect-[3/4] bg-[#ECECEC] w-full overflow-hidden rounded-none">
+                          <img
+                            src={category.image_url}
+                            alt={category.name}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-103"
+                            loading="lazy"
+                          />
+                        </div>
+                        <h3 className="font-bold text-[15px] text-neutral-900 mt-2.5 leading-snug tracking-tight group-hover:underline">
+                          {category.name}
+                        </h3>
+                      </Link>
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+              </div>
+            </>
           )}
         </section>
       </main>
