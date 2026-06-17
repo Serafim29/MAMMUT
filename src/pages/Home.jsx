@@ -4,6 +4,7 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/css'
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 import Navbar from '../components/Navbar'
+import Footer from '../components/Footer'
 import ProductCard from '../components/ProductCard'
 import { supabase } from '../supabaseClient'
 import teaserDesktop from '../assets/teaser_desktop.jpg'
@@ -302,6 +303,7 @@ function Home({ session }) {
           )}
         </section>
       </main>
+      <Footer />
     </div>
   )
 }
