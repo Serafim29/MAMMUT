@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { supabase } from './supabaseClient'
 import Hoame from './pages/Home.jsx'
 import SignUp from './pages/SignUp.jsx'
+import Category from './pages/Category.jsx'
 
 function App() {
   const [session, setSession] = useState(null)
@@ -35,6 +36,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Hoame session={session} />} />
         <Route path="/signup" element={<SignUp session={session} />} />
+        <Route path="/category/:slug" element={<Category session={session} />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>

@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { Link } from 'react-router-dom'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/css'
+import { FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 import Navbar from '../components/Navbar'
 import ProductCard from '../components/ProductCard'
 import { supabase } from '../supabaseClient'
@@ -10,30 +12,52 @@ import trailRun from '../assets/TrailRun_SS26_Chamonix_LG-9.jpg'
 
 function Home({ session }) {
   const [products, setProducts] = useState([])
+  const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
+  const [categoriesLoading, setCategoriesLoading] = useState(true)
   const [error, setError] = useState(null)
   const [isDesktop, setIsDesktop] = useState(typeof window !== 'undefined' ? window.innerWidth > 1023 : true)
+  const swiperRef = useRef(null)
 
   useEffect(() => {
-    async function fetchProducts() {
+    async function fetchData() {
       try {
-        setLoading(true)
-        const { data, error } = await supabase
+        setLoading(true);
+        setCategoriesLoading(true);
+
+        // Fetch products (first 4 footwear products by id)
+        const { data: prodData, error: prodError } = await supabase
           .from('products')
           .select('*')
-          .order('created_at', { ascending: true })
+          .eq('category', 'FOOTWEAR')
+          .order('id', { ascending: true })
+          .limit(4);
         
-        if (error) throw error
-        setProducts(data || [])
+        if (prodError) throw prodError;
+        setProducts(prodData || []);
+
+        // Fetch categories for homepage (only those with images)
+        const { data: catData, error: catError } = await supabase
+          .from('categories')
+          .select('*')
+          .not('image_url', 'is', null)
+          .order('display_order', { ascending: true });
+        
+        if (catError) {
+          console.warn('Could not fetch categories, table might not exist yet:', catError.message);
+        } else {
+          setCategories(catData || []);
+        }
       } catch (err) {
-        console.error('Error fetching products:', err)
+        console.error('Error fetching data:', err)
         setError(err.message)
       } finally {
         setLoading(false)
+        setCategoriesLoading(false)
       }
     }
 
-    fetchProducts()
+    fetchData()
   }, [])
 
   useEffect(() => {
@@ -185,6 +209,80 @@ function Home({ session }) {
               {products.map((product) => (
                 <SwiperSlide key={product.id} className="pb-4">
                   <ProductCard product={product} />
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          )}
+        </section>
+
+        <section className="bg-white px-4 md:px-8 lg:px-12 pb-24 w-full">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-2xl md:text-[32px] font-bold text-black font-sans leading-tight">
+              Shop by category
+            </h2>
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={() => swiperRef.current?.slidePrev()}
+                className="w-10 h-10 rounded-full border border-neutral-200 bg-white flex items-center justify-center hover:bg-neutral-50 hover:border-neutral-300 active:scale-95 transition-all cursor-pointer shadow-sm"
+                aria-label="Previous category"
+              >
+                <FiChevronLeft className="text-xl text-neutral-800" />
+              </button>
+              <button 
+                onClick={() => swiperRef.current?.slideNext()}
+                className="w-10 h-10 rounded-full border border-neutral-200 bg-white flex items-center justify-center hover:bg-neutral-50 hover:border-neutral-300 active:scale-95 transition-all cursor-pointer shadow-sm"
+                aria-label="Next category"
+              >
+                <FiChevronRight className="text-xl text-neutral-800" />
+              </button>
+            </div>
+          </div>
+
+          {categoriesLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
+            </div>
+          ) : categories.length === 0 ? (
+            <div className="text-center text-neutral-500 py-12">
+              Nu s-au gasit categorii.
+            </div>
+          ) : (
+            <Swiper
+              spaceBetween={16}
+              slidesPerView={1.2}
+              grabCursor={true}
+              breakpoints={{
+                640: {
+                  slidesPerView: 2.3,
+                  spaceBetween: 16,
+                },
+                768: {
+                  slidesPerView: 3.3,
+                  spaceBetween: 20,
+                },
+                1024: {
+                  slidesPerView: 4.8,
+                  spaceBetween: 20,
+                }
+              }}
+              onSwiper={(swiper) => { swiperRef.current = swiper; }}
+              className="w-full"
+            >
+              {categories.map((category) => (
+                <SwiperSlide key={category.id}>
+                  <Link to={`/category/${category.slug}`} className="flex flex-col group cursor-pointer w-full text-black select-none">
+                    <div className="relative aspect-[3/4] bg-[#ECECEC] w-full overflow-hidden rounded-none">
+                      <img
+                        src={category.image_url}
+                        alt={category.name}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-103"
+                        loading="lazy"
+                      />
+                    </div>
+                    <h3 className="font-bold text-[15px] text-neutral-900 mt-4 leading-snug tracking-tight group-hover:underline">
+                      {category.name}
+                    </h3>
+                  </Link>
                 </SwiperSlide>
               ))}
             </Swiper>
