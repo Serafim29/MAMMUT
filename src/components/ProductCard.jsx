@@ -1,8 +1,10 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { FiChevronLeft, FiChevronRight, FiHeart } from 'react-icons/fi'
 import { useFavorites } from '../context/FavoritesContext'
 
 function ProductCard({ product }) {
+  const navigate = useNavigate()
   const { isFavorite, toggleFavorite } = useFavorites()
   const images = product.variants?.[0]?.images || []
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
@@ -26,7 +28,10 @@ function ProductCard({ product }) {
   const currentImage = images[currentImageIndex] || 'https://via.placeholder.com/400x500?text=No+Image'
 
   return (
-    <div className="flex flex-col group/card cursor-pointer w-full text-black select-none">
+    <div 
+      onClick={() => navigate(`/product/${product.id}`)}
+      className="flex flex-col group/card cursor-pointer w-full text-black select-none"
+    >
       <div className="relative aspect-[3/4] bg-[#ECECEC] w-full overflow-hidden flex items-center justify-center group/img rounded-none">
         <img
           src={currentImage}
