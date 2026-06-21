@@ -359,7 +359,7 @@ function Navbar({ session }) {
 
               <div className="mt-auto pt-6 flex flex-col gap-4">
                 <Link 
-                  to="/account" 
+                  to="/profile" 
                   onClick={() => setIsNavMenuOpen(false)}
                   className="text-[19px] font-semibold text-black hover:text-[#E30613] transition-colors"
                 >
@@ -455,6 +455,14 @@ function Navbar({ session }) {
                   <p className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider">Logged In As</p>
                   <p className="text-xs text-neutral-800 font-medium truncate mt-0.5">{session.user.email}</p>
                 </div>
+                <Link
+                  to="/profile"
+                  onClick={() => setShowDropdown(false)}
+                  className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs text-neutral-800 hover:bg-neutral-50 transition-colors font-semibold uppercase tracking-wider text-left cursor-pointer border-b border-neutral-100"
+                >
+                  <FiUser size={14} />
+                  My Profile
+                </Link>
                 <button
                   onClick={handleSignOut}
                   className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs text-red-600 hover:bg-neutral-50 transition-colors font-semibold uppercase tracking-wider text-left cursor-pointer"

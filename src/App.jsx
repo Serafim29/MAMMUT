@@ -7,6 +7,7 @@ import Category from './pages/Category.jsx'
 import Saved from './pages/Saved.jsx'
 import ProductDetails from './pages/ProductDetails.jsx'
 import Cart from './pages/Cart.jsx'
+import Profile from './pages/Profile.jsx'
 import { FavoritesProvider } from './context/FavoritesContext'
 import { CartProvider } from './context/CartContext'
 
@@ -47,6 +48,8 @@ function App() {
             <Route path="/saved" element={<Saved session={session} />} />
             <Route path="/product/:id" element={<ProductDetails session={session} />} />
             <Route path="/cart" element={<Cart session={session} />} />
+            <Route path="/profile" element={session ? <Profile session={session} /> : <Navigate to="/signup" replace />} />
+            <Route path="/account" element={<Navigate to="/profile" replace />} />
             <Route path="/favorites" element={<Navigate to="/saved" replace />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
