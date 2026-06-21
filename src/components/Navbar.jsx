@@ -29,35 +29,35 @@ function Navbar({ session }) {
       name: 'Clothing',
       hasSubmenu: true,
       submenuItems: [
-        { name: 'Discover all', icon: null },
-        { name: 'Jackets & Vests', icon: 'jacket' },
-        { name: 'Tops', icon: 'hoodie' },
-        { name: 'Pants & Shorts', icon: 'pants' },
-        { name: 'Accessories', icon: 'cap' }
+        { name: 'Discover all', icon: null, slug: 'clothing' },
+        { name: 'Jackets & Vests', icon: 'jacket', slug: 'jackets-vests' },
+        { name: 'Tops', icon: 'hoodie', slug: 'tops' },
+        { name: 'Pants & Shorts', icon: 'pants', slug: 'pants-shorts' },
+        { name: 'Accessories', icon: 'cap', slug: 'accessories' }
       ]
     },
     {
       name: 'Footwear',
       hasSubmenu: true,
       submenuItems: [
-        { name: 'Discover all', icon: null },
-        { name: 'Hiking Shoes', icon: 'hiking_shoes' },
-        { name: 'Mountaineering Boots', icon: 'mountaineering_boots' },
-        { name: 'Trail Running Shoes', icon: 'trail_running_shoes' },
-        { name: 'Everyday Shoes', icon: 'everyday_shoes' },
-        { name: 'Approach Shoes', icon: 'approach_shoes' }
+        { name: 'Discover all', icon: null, slug: 'footwear' },
+        { name: 'Hiking Shoes', icon: 'hiking_shoes', slug: 'hiking-shoes' },
+        { name: 'Mountaineering Boots', icon: 'mountaineering_boots', slug: 'mountaineering-boots' },
+        { name: 'Trail Running Shoes', icon: 'trail_running_shoes', slug: 'trail-running-shoes' },
+        { name: 'Everyday Shoes', icon: 'everyday_shoes', slug: 'everyday-shoes' },
+        { name: 'Approach Shoes', icon: 'approach_shoes', slug: 'approach-shoes' }
       ]
     },
     {
       name: 'Equipment',
       hasSubmenu: true,
       submenuItems: [
-        { name: 'Discover all', icon: null },
-        { name: 'Backpacks & Bags', icon: 'backpack' },
-        { name: 'Avalanche Equipment', icon: 'avalanche' },
-        { name: 'Climbing Equipment', icon: 'climbing' },
-        { name: 'Sleeping Bags', icon: 'sleeping_bag' },
-        { name: 'Equipment Accessories', icon: 'eq_accessories' }
+        { name: 'Discover all', icon: null, slug: 'equipment' },
+        { name: 'Backpacks & Bags', icon: 'backpack', slug: 'backpacks-bags' },
+        { name: 'Avalanche Equipment', icon: 'avalanche', slug: 'avalanche-equipment' },
+        { name: 'Climbing Equipment', icon: 'climbing', slug: 'climbing-equipment' },
+        { name: 'Sleeping Bags', icon: 'sleeping_bag', slug: 'sleeping-bags' },
+        { name: 'Equipment Accessories', icon: 'eq_accessories', slug: 'equipment-accessories' }
       ]
     },
     {
@@ -69,40 +69,40 @@ function Navbar({ session }) {
       name: 'Shop by Activity',
       hasSubmenu: true,
       submenuItems: [
-        { name: 'Hiking', icon: null },
-        { name: 'Climbing', icon: null },
-        { name: 'Mountaineering', icon: null },
-        { name: 'Snowsports', icon: null },
-        { name: 'Everyday', icon: null },
-        { name: 'Trail Running', icon: null },
-        { name: 'Travel', icon: null }
+        { name: 'Hiking', icon: null, slug: 'hiking' },
+        { name: 'Climbing', icon: null, slug: 'climbing' },
+        { name: 'Mountaineering', icon: null, slug: 'mountaineering' },
+        { name: 'Snowsports', icon: null, slug: 'snowsports' },
+        { name: 'Everyday', icon: null, slug: 'everyday' },
+        { name: 'Trail Running', icon: null, slug: 'trail-running' },
+        { name: 'Travel', icon: null, slug: 'travel' }
       ]
     },
     {
       name: 'Collections',
       hasSubmenu: true,
       submenuItems: [
-        { name: 'Hiking Patrol + Mammut', icon: null },
-        { name: 'Mountain Pro', icon: null },
-        { name: 'New Arrivals', icon: null },
-        { name: 'Color of the season', icon: null },
-        { name: 'Bestseller', icon: null },
-        { name: 'Eiger Extreme', icon: null }
+        { name: 'Hiking Patrol + Mammut', icon: null, slug: 'hiking-patrol-mammut' },
+        { name: 'Mountain Pro', icon: null, slug: 'mountain-pro' },
+        { name: 'New Arrivals', icon: null, slug: 'new-arrivals' },
+        { name: 'Color of the season', icon: null, slug: 'color-season' },
+        { name: 'Bestseller', icon: null, slug: 'bestseller' },
+        { name: 'Eiger Extreme', icon: null, slug: 'eiger-extreme' }
       ]
     },
     {
       name: 'Explore Mammut',
       hasSubmenu: true,
       submenuItems: [
-        { name: 'Take a hike', icon: null },
-        { name: 'About us', icon: null },
-        { name: 'Responsibility', icon: null },
-        { name: 'Our Athletes', icon: null },
-        { name: 'Stories & Guides', icon: null },
-        { name: 'Mammut Mountain School Switzerland', icon: null },
-        { name: 'Repair & Care', icon: null },
-        { name: 'Technologies', icon: null },
-        { name: 'Jacket Finder', icon: null }
+        { name: 'Take a hike', icon: null, slug: 'take-hike' },
+        { name: 'About us', icon: null, slug: 'about-us' },
+        { name: 'Responsibility', icon: null, slug: 'responsibility' },
+        { name: 'Our Athletes', icon: null, slug: 'athletes' },
+        { name: 'Stories & Guides', icon: null, slug: 'stories-guides' },
+        { name: 'Mammut Mountain School Switzerland', icon: null, slug: 'mountain-school' },
+        { name: 'Repair & Care', icon: null, slug: 'repair-care' },
+        { name: 'Technologies', icon: null, slug: 'technologies' },
+        { name: 'Jacket Finder', icon: null, slug: 'jacket-finder' }
       ]
     },
     {
@@ -128,6 +128,14 @@ function Navbar({ session }) {
       case 'sleeping_bag': return <SleepingBagIcon />
       case 'eq_accessories': return <AccessoriesIcon />
       default: return null
+    }
+  }
+
+  const handleSubmenuItemClick = (item) => {
+    if (item.slug) {
+      navigate(`/category/${item.slug}`)
+      setIsNavMenuOpen(false)
+      setHoveredCategory(null)
     }
   }
 
@@ -380,6 +388,7 @@ function Navbar({ session }) {
                   {hoveredCategory.submenuItems.map((item) => (
                     <div 
                       key={item.name}
+                      onClick={() => handleSubmenuItemClick(item)}
                       className="h-[44px] flex items-center justify-between cursor-pointer group/sub select-none hover:text-[#E30613] transition-colors"
                     >
                       <span className="text-[16px] font-medium text-black group-hover/sub:text-[#E30613] transition-colors">
