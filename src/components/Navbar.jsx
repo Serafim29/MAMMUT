@@ -141,7 +141,7 @@ function Navbar({ session }) {
 
   const handleAccountClick = () => {
     if (session) {
-      setShowDropdown(!showDropdown)
+      navigate('/profile')
     } else {
       navigate('/signup')
     }
@@ -441,37 +441,7 @@ function Navbar({ session }) {
               aria-label="Account"
             >
               <FiUser size={22} className="stroke-[1.75px]" />
-              {session && (
-                <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-                </span>
-              )}
             </button>
-
-            {showDropdown && session && (
-              <div className="absolute right-0 mt-3 w-56 bg-white border border-neutral-200 shadow-xl rounded-none py-2 text-left z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-                <div className="px-4 py-2.5 border-b border-neutral-100">
-                  <p className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider">Logged In As</p>
-                  <p className="text-xs text-neutral-800 font-medium truncate mt-0.5">{session.user.email}</p>
-                </div>
-                <Link
-                  to="/profile"
-                  onClick={() => setShowDropdown(false)}
-                  className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs text-neutral-800 hover:bg-neutral-50 transition-colors font-semibold uppercase tracking-wider text-left cursor-pointer border-b border-neutral-100"
-                >
-                  <FiUser size={14} />
-                  My Profile
-                </Link>
-                <button
-                  onClick={handleSignOut}
-                  className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs text-red-600 hover:bg-neutral-50 transition-colors font-semibold uppercase tracking-wider text-left cursor-pointer"
-                >
-                  <FiLogOut size={14} />
-                  Sign Out
-                </button>
-              </div>
-            )}
           </div>
 
           <Link 

@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import 'swiper/css'
 import { FiChevronLeft, FiChevronRight, FiHeart, FiX, FiTruck, FiRotateCcw, FiClock, FiCheck, FiInfo } from 'react-icons/fi'
 import { supabase } from '../supabaseClient'
 import Navbar from '../components/Navbar'
@@ -22,6 +24,25 @@ function ProductDetails({ session }) {
   const [activeImageIndex, setActiveImageIndex] = useState(0)
   const [selectedSize, setSelectedSize] = useState('')
   const [showCartModal, setShowCartModal] = useState(false)
+
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [modalImageIndex, setModalImageIndex] = useState(0)
+  const [isZoomed, setIsZoomed] = useState(false)
+  const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 })
+  const swiperRef = useRef(null)
+  const [isThumbnailsVisible, setIsThumbnailsVisible] = useState(true)
+  const thumbnailsTimeoutRef = useRef(null)
+
+  useEffect(() => {
+    if (isModalOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [isModalOpen])
 
   useEffect(() => {
     async function fetchProduct() {
@@ -90,6 +111,7 @@ function ProductDetails({ session }) {
   const handleVariantClick = (index) => {
     setActiveVariantIndex(index)
     setActiveImageIndex(0)
+    swiperRef.current?.slideTo(0)
     if (product.variants?.[index]?.sizes?.length > 0) {
       setSelectedSize(product.variants[index].sizes[0])
     }
@@ -105,13 +127,75 @@ function ProductDetails({ session }) {
   }
 
   const handlePrevImages = () => {
-    if (images.length <= 2) return
-    setActiveImageIndex((prev) => (prev === 0 ? images.length - 2 : prev - 1))
+    swiperRef.current?.slidePrev()
   }
 
   const handleNextImages = () => {
-    if (images.length <= 2) return
-    setActiveImageIndex((prev) => (prev >= images.length - 2 ? 0 : prev + 1))
+    swiperRef.current?.slideNext()
+  }
+
+  const handleThumbnailClick = (idx) => {
+    setActiveImageIndex(idx)
+    swiperRef.current?.slideTo(idx)
+  }
+
+  const startThumbnailsTimeout = () => {
+    if (thumbnailsTimeoutRef.current) clearTimeout(thumbnailsTimeoutRef.current)
+    thumbnailsTimeoutRef.current = setTimeout(() => {
+      setIsThumbnailsVisible(false)
+    }, 2000)
+  }
+
+  const handlePanelMouseEnter = () => {
+    if (thumbnailsTimeoutRef.current) clearTimeout(thumbnailsTimeoutRef.current)
+    setIsThumbnailsVisible(true)
+  }
+
+  const handlePanelMouseLeave = () => {
+    startThumbnailsTimeout()
+  }
+
+  const handleImageClick = (index) => {
+    setModalImageIndex(index)
+    setIsModalOpen(true)
+    setIsZoomed(false)
+    setIsThumbnailsVisible(true)
+    startThumbnailsTimeout()
+  }
+
+  const handleModalPrev = (e) => {
+    e.stopPropagation()
+    setIsZoomed(false)
+    setModalImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1))
+    setIsThumbnailsVisible(true)
+    startThumbnailsTimeout()
+  }
+
+  const handleModalNext = (e) => {
+    e.stopPropagation()
+    setIsZoomed(false)
+    setModalImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1))
+    setIsThumbnailsVisible(true)
+    startThumbnailsTimeout()
+  }
+
+  const handleMouseMove = (e) => {
+    if (!isZoomed) return
+    const { left, top, width, height } = e.currentTarget.getBoundingClientRect()
+    const x = ((e.clientX - left) / width) * 100
+    const y = ((e.clientY - top) / height) * 100
+    setZoomPos({ x, y })
+  }
+
+  const handleImageZoomClick = (e) => {
+    e.stopPropagation()
+    if (!isZoomed) {
+      const { left, top, width, height } = e.currentTarget.getBoundingClientRect()
+      const x = ((e.clientX - left) / width) * 100
+      const y = ((e.clientY - top) / height) * 100
+      setZoomPos({ x, y })
+    }
+    setIsZoomed(!isZoomed)
   }
 
   const activeMainImage = images[activeImageIndex] || 'https://via.placeholder.com/600x800?text=No+Image'
@@ -195,7 +279,7 @@ function ProductDetails({ session }) {
               {images.map((img, idx) => (
                 <button
                   key={idx}
-                  onClick={() => setActiveImageIndex(idx)}
+                  onClick={() => handleThumbnailClick(idx)}
                   className={`w-[60px] md:w-[76px] aspect-[3/4] bg-[#F5F5F3] overflow-hidden flex items-center justify-center flex-shrink-0 border transition-all cursor-pointer ${
                     activeImageIndex === idx ? 'border-black' : 'border-neutral-200 hover:border-neutral-400'
                   }`}
@@ -207,33 +291,37 @@ function ProductDetails({ session }) {
 
             <div className="relative flex-1 order-1 md:order-2 bg-[#F5F5F3] aspect-[4/3] md:aspect-[3/2] lg:aspect-auto lg:h-[600px] overflow-hidden flex gap-[3px] select-none">
               
-              <div className="hidden md:flex w-full h-full gap-0.5">
-                <div className="w-1/2 h-full overflow-hidden bg-[#F5F5F3]">
-                  <img 
-                    src={activeMainImage} 
-                    alt={product.name} 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="w-1/2 h-full overflow-hidden bg-[#F5F5F3]">
-                  <img 
-                    src={activeSecondaryImage} 
-                    alt={product.name} 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              </div>
+              <Swiper
+                onSwiper={(swiper) => { swiperRef.current = swiper; }}
+                onSlideChange={(swiper) => setActiveImageIndex(swiper.activeIndex)}
+                slidesPerView={1.2}
+                spaceBetween={8}
+                breakpoints={{
+                  768: {
+                    slidesPerView: 1.5,
+                    spaceBetween: 12
+                  }
+                }}
+                className="w-full h-full cursor-grab active:cursor-grabbing"
+              >
+                {images.map((img, idx) => (
+                  <SwiperSlide key={idx} className="h-full overflow-hidden bg-[#F5F5F3]">
+                    <div 
+                      className="w-full h-full overflow-hidden flex items-center justify-center cursor-expand"
+                      onClick={() => handleImageClick(idx)}
+                    >
+                      <img 
+                        src={img} 
+                        alt={`${product.name} gallery image ${idx}`} 
+                        className="w-full h-full object-cover pointer-events-none"
+                      />
+                    </div>
+                  </SwiperSlide>
+                ))}
+              </Swiper>
 
-              <div className="md:hidden w-full h-full">
-                <img 
-                  src={activeMainImage} 
-                  alt={product.name} 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-
-              {images.length > 2 && (
-                <div className="absolute right-6 bottom-6 flex gap-2">
+              {images.length > 1 && (
+                <div className="absolute right-6 bottom-6 flex gap-2 z-10">
                   <button 
                     onClick={handlePrevImages}
                     className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md border border-neutral-100 text-black hover:bg-neutral-50 active:scale-95 transition-all cursor-pointer"
@@ -397,6 +485,110 @@ function ProductDetails({ session }) {
         </section>
 
       </main>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-[#F5F5F3] z-[100] flex flex-col justify-between select-none">
+          <button
+            onClick={() => {
+              setIsModalOpen(false)
+              setIsZoomed(false)
+            }}
+            className="absolute top-6 right-6 w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-md border border-neutral-200 text-black hover:bg-neutral-100 active:scale-95 transition-all cursor-pointer z-[110]"
+            aria-label="Close gallery"
+          >
+            <FiX className="text-xl stroke-[2.5]" />
+          </button>
+
+          <div className="flex-1 w-full flex items-center justify-center relative overflow-hidden px-16">
+            <button
+              onClick={handleModalPrev}
+              className="absolute left-6 top-1/2 -translate-y-1/2 w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-md border border-neutral-200 text-black hover:bg-neutral-100 active:scale-95 transition-all cursor-pointer z-[110]"
+              aria-label="Previous image"
+            >
+              <FiChevronLeft className="text-2xl stroke-[2.5]" />
+            </button>
+
+            <button
+              onClick={handleModalNext}
+              className="absolute right-6 top-1/2 -translate-y-1/2 w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-md border border-neutral-200 text-black hover:bg-neutral-100 active:scale-95 transition-all cursor-pointer z-[110]"
+              aria-label="Next image"
+            >
+              <FiChevronRight className="text-2xl stroke-[2.5]" />
+            </button>
+
+            <div 
+              className="w-full max-w-[90vw] h-[75vh] flex items-center justify-center overflow-hidden transition-all duration-300"
+            >
+              <div 
+                className="relative overflow-hidden w-full h-full flex items-center justify-center"
+                onMouseMove={handleMouseMove}
+              >
+                <img
+                  src={images[modalImageIndex]}
+                  alt={`${product.name} zoom view`}
+                  onClick={handleImageZoomClick}
+                  style={isZoomed ? {
+                    transform: 'scale(2.2)',
+                    transformOrigin: `${zoomPos.x}% ${zoomPos.y}%`,
+                  } : {}}
+                  className={`max-h-full max-w-full object-contain select-none transition-transform duration-200 ${
+                    isZoomed ? 'cursor-zoom-out-custom' : 'cursor-zoom-in-custom'
+                  }`}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div 
+            onMouseEnter={handlePanelMouseEnter}
+            onMouseLeave={handlePanelMouseLeave}
+            className={`fixed bottom-0 left-0 right-0 z-[105] flex flex-col items-center bg-[#F5F5F3] pt-4 pb-5 transition-transform duration-500 ease-in-out select-none ${
+              isThumbnailsVisible ? 'translate-y-0' : 'translate-y-[100px]'
+            }`}
+          >
+            <div className="flex gap-2 overflow-x-auto max-w-[95vw] px-6 scrollbar-none">
+              {images.map((img, idx) => (
+                <div 
+                  key={idx}
+                  className="flex flex-col gap-2 items-center flex-shrink-0"
+                >
+                  <div 
+                    onClick={() => {
+                      setIsZoomed(false)
+                      setModalImageIndex(idx)
+                    }}
+                    className={`h-[2px] w-16 cursor-pointer transition-colors duration-300 ${
+                      modalImageIndex === idx ? 'bg-[#E30613]' : 'bg-neutral-300 hover:bg-neutral-400'
+                    }`}
+                  />
+                  
+                  <button
+                    onClick={() => {
+                      setIsZoomed(false)
+                      setModalImageIndex(idx)
+                    }}
+                    className={`w-16 h-20 bg-white cursor-pointer overflow-hidden relative flex items-center justify-center transition-all ${
+                      modalImageIndex === idx 
+                        ? 'border border-neutral-400 scale-102' 
+                        : 'border border-neutral-200 hover:border-neutral-400'
+                    }`}
+                  >
+                    <img src={img} alt="" className="w-full h-full object-cover animate-fade-in" />
+                    
+                    {idx === images.length - 1 && (
+                      <div className="absolute inset-0 bg-black/10 flex items-center justify-center">
+                        <div className="w-6 h-6 bg-white/95 rounded-full flex items-center justify-center shadow-sm">
+                          <span className="text-black text-[10px] ml-0.5">▶</span>
+                        </div>
+                      </div>
+                    )}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>
